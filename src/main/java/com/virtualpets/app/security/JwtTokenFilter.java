@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class JwtTokenFilter extends OncePerRequestFilter {
-
+    //intercepta les http per veure si hi ha token i si és vàlid encara
     private final JwtTokenProvider jwtTokenProvider;
 
     public JwtTokenFilter (JwtTokenProvider jwtTokenProvider) {
@@ -22,17 +22,25 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+    protected void doFilterInternal(@NonNull  HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getServletPath();
+
+        if (path.equals("/v3/api-docs") || path.startsWith("/swagger-ui")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String token = jwtTokenProvider.resolveToken(request);
-        try{
+
+        try {
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 Authentication auth = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (JwtException e) {
-            response.sendError(HttpStatus.FORBIDDEN.value(), "Invalid credentials");
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Invalid or expired token JWT " + e.getMessage());
             return;
         }
         filterChain.doFilter(request, response);

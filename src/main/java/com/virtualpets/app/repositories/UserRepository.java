@@ -15,4 +15,3 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Mètode per comprovar si un nom d'usuari ja existeix
     boolean existsByUsername(String username);
 }
-

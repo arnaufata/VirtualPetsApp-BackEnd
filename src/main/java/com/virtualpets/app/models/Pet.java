@@ -1,31 +1,43 @@
 package com.virtualpets.app.models;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 @Entity
+@Schema(description = "Represents a virtual pet owned by a user")
 public class Pet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Unique identifier of the pet", example = "1")
     private long id;
 
     @Column(nullable = false)
+    @Schema(description = "Name of the pet", example = "Buddy")
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Schema(description = "Type of the pet", example = "DOG")
     private PetType type;
 
     @Column(nullable = false)
+    @Schema(description = "Color of the pet", example = "brown")
     private String color;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
+    @Schema(description = "Owner of the pet, represented by the User entity")
     private User owner;
 
-    private int energyLevel;    // Nivell d'energia (0-100)
-    private int hungerLevel;    // Nivell de gana (0-100)
-    private int happinessLevel; // Nivell de felicitat (0-100)
+    @Schema(description = "Energy level of the pet, ranges from 0 to 100", example = "80")
+    private int energyLevel;
+
+    @Schema(description = "Hunger level of the pet, ranges from 0 to 100", example = "20")
+    private int hungerLevel;
+
+    @Schema(description = "Happiness level of the pet, ranges from 0 to 100", example = "90")
+    private int happinessLevel;
 
     public Pet(String name, PetType type, String color, User owner) {
         this.name           = name;

@@ -1,28 +1,35 @@
 package com.virtualpets.app.models;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.util.Set;
 
 @Entity
+@Schema(description = "Represents a user in the virtual pet application")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Unique identifier of the user", example = "1")
     private long id;
 
     @Column(nullable = false, unique = true)
+    @Schema(description = "Username of the user", example = "john_doe")
     private String username;
 
     @Column(nullable = false)
+    @Schema(description = "Password of the user", example = "password123", writeOnly = true)
     private String password;
 
     @Column(nullable = false, unique = true)
+    @Schema(description = "Email of the user", example = "johndoe@example.com")
     private String email;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
+    @Schema(description = "Roles assigned to the user", example = "[\"USER\", \"ADMIN\"]")
     private Set<String> roles;
 
     public User(){
