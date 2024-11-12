@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +23,9 @@ public class JwtTokenProvider {
     private final UserService userService;
     private final long validityInMilliseconds;
 
-    public JwtTokenProvider (UserService userService, @Value("${jwt.secret}") String secret, @Value("${jwt.validity}") long validityInMilliseconds) {
+    public JwtTokenProvider (@Lazy UserService userService,
+                             @Value("${jwt.secret}") String secret,
+                             @Value("${jwt.validity}") long validityInMilliseconds) {
         this.secretKey              = Keys.hmacShaKeyFor(secret.getBytes());
         this.userService            = userService;
         this.validityInMilliseconds = validityInMilliseconds;

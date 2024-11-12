@@ -1,2 +1,0 @@
-De la classe JwtTokeProvider, la constrasenya en teoria haura d'anar a 'application.properties'.
-De la classe DataInitializer, els mètodes que necessitarà de UserService.

@@ -5,6 +5,7 @@ import com.virtualpets.app.security.JwtTokenProvider;
 import com.virtualpets.app.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,7 +29,7 @@ public class SecurityConfig{
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
-    public SecurityConfig (JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public SecurityConfig (@Lazy JwtTokenProvider jwtTokenProvider, @Lazy UserService userService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService      = userService;
     }
