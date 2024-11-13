@@ -21,7 +21,7 @@ public class OpenApiConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("pets")
-                .pathsToMatch("/pets/***")
+                .pathsToMatch("/pets/**")
                 .build();
     }
 
@@ -29,7 +29,7 @@ public class OpenApiConfig {
     public GroupedOpenApi authApi() {
         return GroupedOpenApi.builder()
                 .group("auth")
-                .pathsToMatch("/auth/***")
+                .pathsToMatch("/auth/**")
                 .build();
     }
 }
