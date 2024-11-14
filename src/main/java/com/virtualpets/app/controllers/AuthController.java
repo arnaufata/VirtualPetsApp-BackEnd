@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,7 +37,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "User registered successfully")
     @ApiResponse(responseCode = "400", description = "Error in registration process", content = @Content)
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody(description = "User to register") User user) {
+    public ResponseEntity<String> register(@RequestBody User user) {
         try {
             userService.registerUser(user);
             return ResponseEntity.ok("User registered successfully");
@@ -50,7 +50,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "Login successful, token generated", content = @Content(schema = @Schema(implementation = Map.class)))
     @ApiResponse(responseCode = "403", description = "Invalid user credentials", content = @Content)
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody(description = "User credentials for login") User loginUser) {
+    public ResponseEntity<?> login(@RequestBody User loginUser) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword())
