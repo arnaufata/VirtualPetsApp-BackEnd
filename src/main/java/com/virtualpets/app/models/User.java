@@ -29,7 +29,7 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
-    @Schema(description = "Roles assigned to the user", example = "[\"USER\", \"ADMIN\"]")
+    @Schema(description = "Roles assigned to the user", example = "[\"ROLE_USER\", \"ROLE_ADMIN\"]")
     private Set<String> roles;
 
     public User(){

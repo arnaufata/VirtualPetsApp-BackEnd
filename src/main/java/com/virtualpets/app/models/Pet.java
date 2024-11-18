@@ -39,6 +39,9 @@ public class Pet {
     @Schema(description = "Happiness level of the pet, ranges from 0 to 100", example = "90")
     private int happinessLevel;
 
+    public Pet() {
+    }
+
     public Pet(String name, PetType type, String color, User owner) {
         this.name           = name;
         this.type           = type;

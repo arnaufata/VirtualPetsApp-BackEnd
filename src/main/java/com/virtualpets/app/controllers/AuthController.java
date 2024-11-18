@@ -1,5 +1,7 @@
 package com.virtualpets.app.controllers;
 
+import com.virtualpets.app.dto.LoginUserDTO;
+import com.virtualpets.app.dto.RegisterUserDTO;
 import com.virtualpets.app.models.User;
 import com.virtualpets.app.security.JwtTokenProvider;
 import com.virtualpets.app.services.UserService;
@@ -37,8 +39,15 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "User registered successfully")
     @ApiResponse(responseCode = "400", description = "Error in registration process", content = @Content)
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
+    public ResponseEntity<String> register(@RequestBody RegisterUserDTO registerUserDTO) {
         try {
+            // Crear un nou usuari a partir del DTO
+            User user = new User();
+            user.setUsername(registerUserDTO.getUsername());
+            user.setPassword(registerUserDTO.getPassword());
+            user.setEmail(registerUserDTO.getEmail());
+
+            // Registrar l'usuari
             userService.registerUser(user);
             return ResponseEntity.ok("User registered successfully");
         } catch (IllegalArgumentException e) {
@@ -50,16 +59,14 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "Login successful, token generated", content = @Content(schema = @Schema(implementation = Map.class)))
     @ApiResponse(responseCode = "403", description = "Invalid user credentials", content = @Content)
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginUser) {
+    public ResponseEntity<?> login(@RequestBody LoginUserDTO loginUserDTO) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword())
+                    new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword())
             );
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-
             String token = jwtTokenProvider.createToken(userDetails.getUsername(), userDetails.getAuthorities().toString());
-
 
             return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {

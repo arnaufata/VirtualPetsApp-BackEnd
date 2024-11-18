@@ -1,5 +1,6 @@
 package com.virtualpets.app.controllers;
 
+import com.virtualpets.app.dto.PetCreateDTO;
 import com.virtualpets.app.models.Pet;
 import com.virtualpets.app.models.User;
 import com.virtualpets.app.services.PetService;
@@ -11,11 +12,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,11 +44,22 @@ public class PetController {
     })
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping("/create")
-    public ResponseEntity<String> createPet(@Parameter(description = "Pet details") @RequestBody Pet pet, Authentication authentication) {
-        Optional<User> owner = userService.findByUsername(authentication.getName());
+    public ResponseEntity<String> createPet(
+            @Parameter(description = "Pet creation details") @RequestBody PetCreateDTO petCreateDTO) {
+        String username = getAuthenticatedUsername();
+        Optional<User> owner = userService.findByUsername(username);
         if (owner.isPresent()) {
+            Pet pet = new Pet();
+            pet.setName(petCreateDTO.getName());
+            pet.setType(petCreateDTO.getType());
+            pet.setColor(petCreateDTO.getColor());
+            pet.setOwner(owner.get());
+            pet.setEnergyLevel(100);  // Default values
+            pet.setHungerLevel(0);
+            pet.setHappinessLevel(100);
+
             petService.createPet(pet, owner.get());
-            return ResponseEntity.ok("Successfully created pet");
+            return ResponseEntity.status(201).body("Successfully created pet");
         } else {
             return ResponseEntity.status(404).body("User not found");
         }
@@ -56,10 +69,11 @@ public class PetController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of user's pets", content = @Content(schema = @Schema(implementation = List.class)))
     })
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping
-    public ResponseEntity<List<Pet>> getAllPets(Authentication authentication) {
-        List<Pet> pets = petService.getPetsByUser(authentication.getName());
+    public ResponseEntity<List<Pet>> getAllPets() {
+        String username = getAuthenticatedUsername();
+        List<Pet> pets = petService.getPetsByUser(username);
         return ResponseEntity.ok(pets);
     }
 
@@ -69,14 +83,14 @@ public class PetController {
             @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Pet not found", content = @Content)
     })
-    @PreAuthorize("hasRole('ROLE_USER') and @petService.hasAccessToPet(#updatedPet, authentication)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and @petService.isUserAllowedToAccessPet(#id, authentication))")
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updatePet(
             @Parameter(description = "Pet ID") @PathVariable Long id,
-            @Parameter(description = "Updated pet details") @RequestBody Pet petDetails,
-            Authentication authentication) {
-        boolean isUpdated = petService.updatePet(id, petDetails, authentication.getName());
-        return isUpdated ? ResponseEntity.ok("Updated pet") : ResponseEntity.status(403).body("Access denied");
+            @Parameter(description = "Updated pet details") @RequestBody Pet petDetails) {
+        String username = getAuthenticatedUsername();
+        boolean isUpdated = petService.updatePet(id, petDetails, username);
+        return isUpdated ? ResponseEntity.ok("Pet updated successfully") : ResponseEntity.status(403).body("Access denied");
     }
 
     @Operation(summary = "Delete a pet", description = "Delete a pet owned by the authenticated user.")
@@ -85,11 +99,16 @@ public class PetController {
             @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Pet not found", content = @Content)
     })
-    @PreAuthorize("hasRole('ROLE_USER') and @petService.hasAccessToPet(#petId, authentication)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and @petService.isUserAllowedToAccessPet(#id, authentication))")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletePet(@Parameter(description = "ID de la mascota") @PathVariable Long id,
-                                            Authentication authentication) {
-        boolean isDeleted = petService.deletePet(id, authentication.getName());
-        return isDeleted ? ResponseEntity.ok("Pet deleted") : ResponseEntity.status(403).body("Access denied");
+    public ResponseEntity<String> deletePet(@Parameter(description = "ID de la mascota") @PathVariable Long id) {
+        String username = getAuthenticatedUsername();
+        boolean isDeleted = petService.deletePet(id, username);
+        return isDeleted ? ResponseEntity.ok("Pet deleted successfully") : ResponseEntity.status(403).body("Access denied");
+    }
+
+    private String getAuthenticatedUsername() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getUsername();
     }
 }

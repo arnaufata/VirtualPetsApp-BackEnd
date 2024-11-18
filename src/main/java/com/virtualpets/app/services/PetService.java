@@ -34,7 +34,15 @@ public class PetService {
 
     public List<Pet> getPetsByUser(String username) {
         return userRepository.findByUsername(username)
-                .map(user -> user.getRoles().contains("ROLE_ADMIN") ? petRepository.findAll() : petRepository.findByOwner(user))
+                .map(user -> {
+                    if (user.getRoles().contains("ROLE_ADMIN")) {
+                        // Administradors veuen totes les mascotes
+                        return petRepository.findAll();
+                    } else {
+                        // Usuaris normals veuen només les seves mascotes
+                        return petRepository.findByOwner(user);
+                    }
+                })
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
     }
 
