@@ -62,6 +62,31 @@ public class PetService {
         }).orElse(false);
     }
 
+    public boolean interactWithPet(Long petId, String action, String username) {
+        return petRepository.findById(petId).map(pet -> {
+            if (isUserAllowedToModifyPet(pet, username)) {
+                switch (action.toLowerCase()) {
+                    case "feed":
+                        pet.feed();
+                        break;
+                    case "play":
+                        pet.play();
+                        break;
+                    case "rest":
+                        pet.rest();
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown action: " + action);
+                }
+                petRepository.save(pet);
+                logger.info("Mascota interactuada amb èxit. Acció: {} per l'usuari: {}", action, username);
+                return true;
+            }
+            return false;
+        }).orElse(false);
+    }
+
+
     public boolean deletePet(Long petId, String username) {
         return petRepository.findById(petId).map(pet -> {
             if (isUserAllowedToModifyPet(pet, username)) {

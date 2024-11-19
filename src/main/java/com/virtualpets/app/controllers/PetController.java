@@ -93,6 +93,23 @@ public class PetController {
         return isUpdated ? ResponseEntity.ok("Pet updated successfully") : ResponseEntity.status(403).body("Access denied");
     }
 
+    @Operation(summary = "Interact with a pet", description = "Allows the user to perform an action (feed, play, rest) on their pet.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pet interaction successful", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Pet not found", content = @Content)
+    })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and @petService.isUserAllowedToAccessPet(#id, authentication))")
+    @PostMapping("/interact/{id}")
+    public ResponseEntity<String> interactWithPet(
+            @Parameter(description = "Pet ID") @PathVariable Long id,
+            @Parameter(description = "Action to perform (feed, play, rest)") @RequestParam String action) {
+        String username = getAuthenticatedUsername();
+        boolean isInteracted = petService.interactWithPet(id, action, username);
+        return isInteracted ? ResponseEntity.ok("Interaction successful") : ResponseEntity.status(403).body("Access denied");
+    }
+
+
     @Operation(summary = "Delete a pet", description = "Delete a pet owned by the authenticated user.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pet deleted successfully", content = @Content),
