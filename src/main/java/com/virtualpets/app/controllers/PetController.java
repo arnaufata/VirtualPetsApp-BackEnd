@@ -1,6 +1,7 @@
 package com.virtualpets.app.controllers;
 
 import com.virtualpets.app.dto.PetCreateDTO;
+import com.virtualpets.app.dto.PetUpdateDTO;
 import com.virtualpets.app.models.Pet;
 import com.virtualpets.app.models.User;
 import com.virtualpets.app.services.PetService;
@@ -104,9 +105,9 @@ public class PetController {
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updatePet(
             @Parameter(description = "Pet ID") @PathVariable Long id,
-            @Parameter(description = "Updated pet details") @RequestBody Pet petDetails) {
+            @Parameter(description = "Updated pet details") @RequestBody PetUpdateDTO petUpdateDTO) {
         String username = getAuthenticatedUsername();
-        boolean isUpdated = petService.updatePet(id, petDetails, username);
+        boolean isUpdated = petService.updatePet(id, petUpdateDTO, username);
         return isUpdated ? ResponseEntity.ok("Pet updated successfully") : ResponseEntity.status(403).body("Access denied");
     }
 

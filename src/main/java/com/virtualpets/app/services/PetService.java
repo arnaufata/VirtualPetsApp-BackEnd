@@ -1,5 +1,6 @@
 package com.virtualpets.app.services;
 
+import com.virtualpets.app.dto.PetUpdateDTO;
 import com.virtualpets.app.exceptions.UserNotFoundException;
 import com.virtualpets.app.models.Pet;
 import com.virtualpets.app.models.User;
@@ -46,14 +47,12 @@ public class PetService {
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
     }
 
-    public boolean updatePet(Long petId, Pet petDetails, String username) {
+    public boolean updatePet(Long petId, PetUpdateDTO petUpdateDTO, String username) {
         return petRepository.findById(petId).map(pet -> {
             if (isUserAllowedToModifyPet(pet, username)) {
-                pet.setName(petDetails.getName());
-                pet.setColor(petDetails.getColor());
-                pet.setEnergyLevel(petDetails.getEnergyLevel());
-                pet.setHungerLevel(petDetails.getHungerLevel());
-                pet.setHappinessLevel(petDetails.getHappinessLevel());
+                if (petUpdateDTO.getName() != null && !petUpdateDTO.getName().isEmpty()) {
+                    pet.setName(petUpdateDTO.getName());
+                }
                 petRepository.save(pet);
                 logger.info("Mascota actualitzada per l'usuari: {}", username);
                 return true;
