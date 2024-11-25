@@ -39,6 +39,9 @@ public class Pet {
     @Schema(description = "Happiness level of the pet, ranges from 0 to 100", example = "90")
     private int happinessLevel;
 
+    @Transient // No es guarda a la base de dades
+    private String imageUrl;
+
     public Pet() {
     }
 
@@ -114,6 +117,11 @@ public class Pet {
 
     public void setHappinessLevel(int happinessLevel) {
         this.happinessLevel = happinessLevel;
+    }
+
+    public String getImageUrl() {
+        // Genera la URL d’imatge en funció del tipus i el color
+        return "/images/" + this.type.toString().toLowerCase() + "_" + this.color.toLowerCase() + ".png";
     }
 
     // Mètodes per interactuar amb la mascota

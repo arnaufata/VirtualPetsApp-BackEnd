@@ -20,7 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Tag(name = "Pet Controller", description = "Endpoints to handle pet interactions")
@@ -54,7 +56,7 @@ public class PetController {
             pet.setType(petCreateDTO.getType());
             pet.setColor(petCreateDTO.getColor());
             pet.setOwner(owner.get());
-            pet.setEnergyLevel(100);  // Default values
+            pet.setEnergyLevel(100);
             pet.setHungerLevel(0);
             pet.setHappinessLevel(100);
 
@@ -71,10 +73,25 @@ public class PetController {
     })
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping
-    public ResponseEntity<List<Pet>> getAllPets() {
+    public ResponseEntity<List<Map<String, Object>>> getAllPets() {
         String username = getAuthenticatedUsername();
         List<Pet> pets = petService.getPetsByUser(username);
-        return ResponseEntity.ok(pets);
+
+        // Afegim l'atribut imageUrl a cada mascota
+        List<Map<String, Object>> petsWithImages = pets.stream().map(pet -> {
+            Map<String, Object> petData = new HashMap<>();
+            petData.put("id", pet.getId());
+            petData.put("name", pet.getName());
+            petData.put("type", pet.getType());
+            petData.put("color", pet.getColor());
+            petData.put("energyLevel", pet.getEnergyLevel());
+            petData.put("hungerLevel", pet.getHungerLevel());
+            petData.put("happinessLevel", pet.getHappinessLevel());
+            petData.put("imageUrl", pet.getImageUrl()); // Genera la URL
+            return petData;
+        }).toList();
+
+        return ResponseEntity.ok(petsWithImages);
     }
 
     @Operation(summary = "Update pet details", description = "Update the details of a specific pet owned by the authenticated user.")
