@@ -58,11 +58,11 @@ The application exposes RESTful API endpoints for the following functionalities:
 - **POST /auth/login**: Login and receive a JWT token.
 
 ### Pet Management
-- **GET /pets**: Retrieve all pets (Admin only).
-- **POST /pets**: Create a new pet.
-- **GET /pets/{id}**: Retrieve a pet by its ID.
-- **PUT /pets/{id}**: Update a pet's information.
-- **DELETE /pets/{id}**: Delete a pet.
+- **POST /pets/create**: Create a new pet for the authenticated user.
+- **GET /pets**: Retrieve all pets associated with the authenticated user.
+- **PUT /pets/update/{id}**: Update the details of a specific pet owned by the authenticated user.
+- **POST /pets/interact/{id}**: Perform an action (feed, play, rest) on a pet owned by the authenticated user.
+- **DELETE /pets/delete/{id}**: Delete a pet owned by the authenticated user.
 
 ### Swagger UI
 Access the API documentation at:
