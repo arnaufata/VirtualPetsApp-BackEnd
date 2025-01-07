@@ -27,7 +27,6 @@ git clone https://github.com/arnaufata/VirtualPetsApp-Backend.git
 Modify the `application.properties` file to match your database and JWT settings:
 
 ```bash
-Copia el codi
 # Database configuration
 spring.datasource.url=jdbc:mysql://localhost:3306/virtual_pets
 spring.datasource.username=<your_database_username>
@@ -72,7 +71,6 @@ http://localhost:8080/swagger-ui.html
 ```
 ## 📂 Project Structure
 ```bash
-Copia el codi
 VirtualPetsApp-Backend/
 ├── src/
 │   ├── main/
@@ -95,14 +93,14 @@ VirtualPetsApp-Backend/
 - `repository/`: Interfaces for database operations.
 - `service/`: Contains the business logic.
 - `config/`: Configuration classes, including security and JWT setup.
-- 
+  
 ## 🐾 Role-Based Authorization
 The backend implements role-based authorization:
 
 - **User Role (ROLE_USER)**:
-- Access to their own pets for reading, updating, and deleting.
+  - Access to their own pets for reading, updating, and deleting.
 - **Admin Role (ROLE_ADMIN)**:
-- Full access to all pets and system data.
+  - Full access to all pets and system data.
 
 ## 🎨 Customization
 You can customize the application by modifying:
